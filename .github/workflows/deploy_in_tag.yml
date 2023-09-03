@@ -34,8 +34,8 @@ jobs:
       - name: Install web app dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install --immutable
-      - name: Build web app
-        run: yarn run ci-build:hybrid-web-assets
+      - name: After Install
+        run: ls -la
   deploy-ios:
     needs: prepare-web-assets
     runs-on: macos-latest
