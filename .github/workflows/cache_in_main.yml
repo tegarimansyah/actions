@@ -37,7 +37,7 @@ jobs:
       - name: After Install
         run: ls -la
 
-  prepare-web-assets:
+  prepare-web-assets-macos:
     runs-on: macos-latest
     strategy:
       matrix:
