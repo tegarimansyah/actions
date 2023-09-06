@@ -5,7 +5,6 @@ name: Cache in Main
       - main
 jobs:
   prepare-web-assets:
-    if: steps.cache-node-modules.outputs.cache-hit != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,8 +37,28 @@ jobs:
       - name: After Install
         run: ls -la
 
+  check-cache-macos:
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Cache state
+        id: cache-node-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: macOS-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            macOS-yarn-
+      - name: Cache True
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        run: echo "::set-output name=cache-exists::true"
+      - name: Cache False
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: echo "::set-output name=cache-exists::false"
+
   prepare-web-assets-macos:
-    if: steps.cache-node-modules.outputs.cache-hit != 'true'
+    if: needs.check-cache-macos.outputs.cache-exists != 'true'
     runs-on: macos-latest
     strategy:
       matrix:
