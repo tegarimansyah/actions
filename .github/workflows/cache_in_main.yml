@@ -38,6 +38,7 @@ jobs:
         run: ls -la
 
   check-cache-macos:
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
