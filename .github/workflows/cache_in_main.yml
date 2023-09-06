@@ -5,6 +5,7 @@ name: Cache in Main
       - main
 jobs:
   prepare-web-assets:
+    if: steps.cache-node-modules.outputs.cache-hit != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,6 +39,7 @@ jobs:
         run: ls -la
 
   prepare-web-assets-macos:
+    if: steps.cache-node-modules.outputs.cache-hit != 'true'
     runs-on: macos-latest
     strategy:
       matrix:
