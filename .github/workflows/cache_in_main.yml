@@ -53,14 +53,11 @@ jobs:
           key: macOS-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
           restore-keys: |
             macOS-yarn-
-      - name: Cache True
-        id: cache-true
-        if: steps.cache-node-modules.outputs.cache-hit == 'true'
-        run: echo "::set-output name=cache-exists::true"
-      - name: Cache False
-        id: cache-false
-        if: steps.cache-node-modules.outputs.cache-hit == 'true'
-        run: echo "::set-output name=cache-exists::false"
+      - name: Cache Result
+        id: cache_result
+        run: |
+          echo "cache_exists=${{ steps.cache-node-modules.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
   prepare-web-assets-macos:
     needs: check-cache-macos
