@@ -39,6 +39,8 @@ jobs:
 
   check-cache-macos:
     runs-on: ubuntu-latest
+    outputs:
+      cache_exists: ${{ steps.cache_result.outputs.cache_exists }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -51,16 +53,15 @@ jobs:
           key: macOS-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             macOS-yarn-
-      - name: Cache True
-        if: steps.cache-node-modules.outputs.cache-hit == 'true'
-        run: echo "::set-output name=cache-exists::true"
-      - name: Cache False
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: echo "::set-output name=cache-exists::false"
+      - name: Cache Result
+        id: cache_result
+        run: |
+          echo "cache_exists=${{ steps.cache-node-modules.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
   prepare-web-assets-macos:
     needs: check-cache-macos
-    if: needs.check-cache-macos.outputs.cache-exists != 'true'
+    if: needs.check-cache-macos.outputs.cache_exists != 'true'
     runs-on: macos-latest
     strategy:
       matrix:
