@@ -4,7 +4,36 @@ name: Cache in Main
     branches:
       - main
 jobs:
+  check-cache:
+    runs-on: ubuntu-latest
+    outputs:
+      cache_macos_exists: ${{ steps.cache-macos-node-modules.outputs.cache-hit }}
+      cache_linux_exists: ${{ steps.cache-linux-node-modules.outputs.cache-hit }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Cache MacOs State
+        id: cache-macos-node-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: macOS-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
+          restore-keys: |
+            macOS-yarn-
+      - name: Cache Linux State
+        id: cache-linux-node-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: Linux-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
+          restore-keys: |
+            Linux-yarn-
+
   prepare-web-assets:
+    needs: check-cache
+    if: needs.check-cache.outputs.cache_linux_exists != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -37,31 +66,31 @@ jobs:
       - name: After Install
         run: ls -la
 
-  check-cache-macos:
-    runs-on: ubuntu-latest
-    outputs:
-      cache_exists: ${{ steps.cache_result.outputs.cache_exists }}
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-          key: macOS-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
-          restore-keys: |
-            macOS-yarn-
-      - name: Cache Result
-        id: cache_result
-        run: |
-          echo "cache_exists=${{ steps.cache-node-modules.outputs.cache-hit }}" >> $GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
+  # check-cache-macos:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     cache_exists: ${{ steps.cache-node-modules.outputs.cache-hit }}
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v3
+  #     - name: Cache state
+  #       id: cache-node-modules
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           node_modules
+  #         key: macOS-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
+  #         restore-keys: |
+  #           macOS-yarn-
+  #     - name: Cache Result
+  #       id: cache_result
+  #       run: |
+  #         echo "cache_exists=${{ steps.cache-node-modules.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+  #         echo $GITHUB_OUTPUT
 
   prepare-web-assets-macos:
-    needs: check-cache-macos
-    if: needs.check-cache-macos.outputs.cache_exists != 'true'
+    needs: check-cache
+    if: needs.check-cache.outputs.cache_macos_exists != 'true'
     runs-on: macos-latest
     strategy:
       matrix:
