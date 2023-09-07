@@ -16,8 +16,7 @@ jobs:
         id: cache-macos-node-modules
         uses: actions/cache@v3
         with:
-          path: |
-            node_modules
+          lookup-only: true
           key: macOS-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
           restore-keys: |
             macOS-yarn-
@@ -25,8 +24,7 @@ jobs:
         id: cache-linux-node-modules
         uses: actions/cache@v3
         with:
-          path: |
-            node_modules
+          lookup-only: true
           key: Linux-yarn-${{ hashFiles('yarn.lock', 'cordova-base-dev/config.xml', 'cordova-base-dev/package.json', 'cordova-base-dev/package-lock.json') }}
           restore-keys: |
             Linux-yarn-
