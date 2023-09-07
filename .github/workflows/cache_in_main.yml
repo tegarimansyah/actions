@@ -31,7 +31,7 @@ jobs:
           restore-keys: |
             Linux-yarn-
 
-  prepare-web-assets:
+  prepare-web-assets-linux:
     needs: check-cache
     if: needs.check-cache.outputs.cache_linux_exists != 'true'
     runs-on: ubuntu-latest
