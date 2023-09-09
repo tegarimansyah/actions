@@ -6,163 +6,141 @@ name: Deploy Hybrid Apps
 jobs:
   prepare-web-assets:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    outputs:
-      appVariant: ${{ matrix.appVariant }}
-      audience: ${{ matrix.audience }}
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
-      APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+    # strategy:
+    #   matrix:
+    #     appVariant:
+    #       - base
+    #     audience:
+    #       - dev
+    #       - prod
+    # outputs:
+    #   appVariant: ${{ matrix.appVariant }}
+    #   audience: ${{ matrix.audience }}
+    # env:
+    #   APP_VARIANT: ${{ matrix.appVariant }}
+    #   AUDIENCE: ${{ matrix.audience }}
+    #   APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Prepare Environment Variable Key and Secret Key
         run: |
-          echo "APP_VARIANT_UPPER=$(echo "${{ matrix.appVariant }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-          echo "AUDIENCE_UPPER=$(echo "${{ matrix.audience }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_ID
-        run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
-        run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            elm-stuff/
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-      - name: Upload assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: hybrid-web-assets-${{ matrix.appVariant }}-${{ matrix.audience }}
-          path: builds/hybrid/${{ matrix.appVariant }}-${{ matrix.audience }}
+          git tag 0.0.1
+          git push origin 0.0.1
   
   
-  deploy-ios:
-    needs: prepare-web-assets
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
-      APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
-    steps:
-      - name: Prepare Environment Variable Key and Secret Key
-        run: |
-          echo "APP_VARIANT_UPPER=$(echo "${{ matrix.appVariant }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-          echo "AUDIENCE_UPPER=$(echo "${{ matrix.audience }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_ID
-        run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
-        run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Dynamically Set Cordova Root Path
-        run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            elm-stuff/
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Cache Cordova Deps
-        id: cache-cordova-deps
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
-            ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
-            ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
-          key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
-      - name: Download assets
-        uses: actions/download-artifact@v3
-        with:
-          name: hybrid-web-assets-${{ matrix.appVariant }}-${{ matrix.audience }}
-          path: cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/www
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+#   deploy-ios:
+#     needs: prepare-web-assets
+#     runs-on: macos-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         appVariant:
+#           - base
+#         audience:
+#           - dev
+#           - prod
+#     env:
+#       APP_VARIANT: ${{ matrix.appVariant }}
+#       AUDIENCE: ${{ matrix.audience }}
+#       APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+#     steps:
+#       - name: Prepare Environment Variable Key and Secret Key
+#         run: |
+#           echo "APP_VARIANT_UPPER=$(echo "${{ matrix.appVariant }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+#           echo "AUDIENCE_UPPER=$(echo "${{ matrix.audience }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+#       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_ID
+#         run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+#       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
+#         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+#       - name: Dynamically Set Cordova Root Path
+#         run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
+#       - name: Check out repository code
+#         uses: actions/checkout@v3
+#       - name: Cache state
+#         id: cache-node-modules
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             node_modules
+#             elm-stuff/
+#           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+#           restore-keys: |
+#             ${{ runner.os }}-yarn-
+#       - name: Cache Cordova Deps
+#         id: cache-cordova-deps
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
+#             ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
+#             ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
+#           key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
+#           restore-keys: |
+#             ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
+#       - name: Download assets
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: hybrid-web-assets-${{ matrix.appVariant }}-${{ matrix.audience }}
+#           path: cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/www
+#       - name: Install web app dependencies
+#         if: steps.cache-node-modules.outputs.cache-hit != 'true'
+#         run: yarn install --immutable
 
-  deploy-android:
-    needs: prepare-web-assets
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
-      APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
-    steps:
-      - name: Prepare Environment Variable Key and Secret Key
-        run: |
-          echo "APP_VARIANT_UPPER=$(echo "${{ matrix.appVariant }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-          echo "AUDIENCE_UPPER=$(echo "${{ matrix.audience }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_ID
-        run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
-        run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
-      - name: Dynamically Set Cordova Root Path
-        run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            elm-stuff/
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Cache Cordova Deps
-        id: cache-cordova-deps
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
-            ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
-            ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
-          key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
-      - name: Download assets
-        uses: actions/download-artifact@v3
-        with:
-          name: hybrid-web-assets-${{ matrix.appVariant }}-${{ matrix.audience }}
-          path: cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/www
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+#   deploy-android:
+#     needs: prepare-web-assets
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         appVariant:
+#           - base
+#         audience:
+#           - dev
+#           - prod
+#     env:
+#       APP_VARIANT: ${{ matrix.appVariant }}
+#       AUDIENCE: ${{ matrix.audience }}
+#       APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+#     steps:
+#       - name: Prepare Environment Variable Key and Secret Key
+#         run: |
+#           echo "APP_VARIANT_UPPER=$(echo "${{ matrix.appVariant }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+#           echo "AUDIENCE_UPPER=$(echo "${{ matrix.audience }}" | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+#       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_ID
+#         run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+#       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
+#         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+#       - name: Dynamically Set Cordova Root Path
+#         run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
+#       - name: Check out repository code
+#         uses: actions/checkout@v3
+#       - name: Cache state
+#         id: cache-node-modules
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             node_modules
+#             elm-stuff/
+#           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+#           restore-keys: |
+#             ${{ runner.os }}-yarn-
+#       - name: Cache Cordova Deps
+#         id: cache-cordova-deps
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
+#             ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
+#             ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
+#           key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
+#           restore-keys: |
+#             ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
+#       - name: Download assets
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: hybrid-web-assets-${{ matrix.appVariant }}-${{ matrix.audience }}
+#           path: cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/www
+#       - name: Install web app dependencies
+#         if: steps.cache-node-modules.outputs.cache-hit != 'true'
+#         run: yarn install --immutable

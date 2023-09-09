@@ -6,95 +6,97 @@ name: Deploy Apps
 jobs:
   prepare-web-assets:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    outputs:
-      appVariant: ${{ matrix.appVariant }}
-      audience: ${{ matrix.audience }}
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
+    # strategy:
+    #   matrix:
+    #     appVariant:
+    #       - base
+    #     audience:
+    #       - dev
+    #       - prod
+    # outputs:
+    #   appVariant: ${{ matrix.appVariant }}
+    #   audience: ${{ matrix.audience }}
+    # env:
+    #   APP_VARIANT: ${{ matrix.appVariant }}
+    #   AUDIENCE: ${{ matrix.audience }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-      - name: After Install
-        run: ls -la
-  deploy-ios:
-    needs: prepare-web-assets
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-      - name: After Install
-        run: ls -la
-  deploy-android:
-    needs: prepare-web-assets
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        appVariant:
-          - base
-        audience:
-          - dev
-          - prod
-    env:
-      APP_VARIANT: ${{ matrix.appVariant }}
-      AUDIENCE: ${{ matrix.audience }}
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - name: Cache state
-        id: cache-node-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install web app dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-      - name: After Install
-        run: ls -la
+      - name: test run
+        run: echo "run successfully"
+  #     - name: Cache state
+  #       id: cache-node-modules
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           node_modules
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-
+  #     - name: Install web app dependencies
+  #       if: steps.cache-node-modules.outputs.cache-hit != 'true'
+  #       run: yarn install --immutable
+  #     - name: After Install
+  #       run: ls -la
+  # deploy-ios:
+  #   needs: prepare-web-assets
+  #   runs-on: macos-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       appVariant:
+  #         - base
+  #       audience:
+  #         - dev
+  #         - prod
+  #   env:
+  #     APP_VARIANT: ${{ matrix.appVariant }}
+  #     AUDIENCE: ${{ matrix.audience }}
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v3
+  #     - name: Cache state
+  #       id: cache-node-modules
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           node_modules
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-
+  #     - name: Install web app dependencies
+  #       if: steps.cache-node-modules.outputs.cache-hit != 'true'
+  #       run: yarn install --immutable
+  #     - name: After Install
+  #       run: ls -la
+  # deploy-android:
+  #   needs: prepare-web-assets
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       appVariant:
+  #         - base
+  #       audience:
+  #         - dev
+  #         - prod
+  #   env:
+  #     APP_VARIANT: ${{ matrix.appVariant }}
+  #     AUDIENCE: ${{ matrix.audience }}
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v3
+  #     - name: Cache state
+  #       id: cache-node-modules
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           node_modules
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-
+  #     - name: Install web app dependencies
+  #       if: steps.cache-node-modules.outputs.cache-hit != 'true'
+  #       run: yarn install --immutable
+  #     - name: After Install
+  #       run: ls -la
