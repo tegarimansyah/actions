@@ -76,7 +76,7 @@ jobs:
       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
       - name: Dynamically Set Cordova Root Path
-        runc echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
+        run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Cache state
@@ -134,7 +134,7 @@ jobs:
       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
       - name: Dynamically Set Cordova Root Path
-        runc echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
+        run: echo "CORDOVA_ROOT_APP=${{ format('cordova-{0}-{1}', matrix.appVariant, matrix.audience) }}" >> $GITHUB_ENV
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Cache state
