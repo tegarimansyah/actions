@@ -75,6 +75,8 @@ jobs:
         run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+      - name: Dynamically Set Cordova Root Path
+        runc echo "CORDOVA_ROOT_APP=cordova-${{ matrix.appVariant }}-${{ matrix.audience }}" >> $GITHUB_ENV
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Cache state
@@ -92,14 +94,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/node_modules
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/platforms
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/plugins
-          key: ${{ runner.os }}-cordova-${{ matrix.appVariant }}-${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package.json', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package-lock.json') }}
+            ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
+            ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
+            ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
+          key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
           restore-keys: |
-            ${{ runner.os }}-cordova-${{ matrix.appVariant }}-
-      - run: echo 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml'
-      - run: echo ${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml') }}
+            ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
       - name: Download assets
         uses: actions/download-artifact@v3
         with:
@@ -133,6 +133,8 @@ jobs:
         run: echo "AWS_DEPLOY_ACCESS_KEY_ID_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_ID_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
       - name: Dynamically Set AWS_DEPLOY_ACCESS_KEY_SECRET
         run: echo "AWS_DEPLOY_ACCESS_KEY_SECRET_${APP_VARIANT_UPPER}_${AUDIENCE_UPPER}=${{ secrets[format('AWS_DEPLOY_ACCESS_KEY_SECRET_{0}_{1}', env.APP_VARIANT_UPPER, env.AUDIENCE_UPPER)] }}" >> $GITHUB_ENV
+      - name: Dynamically Set Cordova Root Path
+        runc echo "CORDOVA_ROOT_APP=cordova-${{ matrix.appVariant }}-${{ matrix.audience }}" >> $GITHUB_ENV
       - name: Check out repository code
         uses: actions/checkout@v3
       - name: Cache state
@@ -150,12 +152,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/node_modules
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/platforms
-            cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/plugins
-          key: ${{ runner.os }}-cordova-${{ matrix.appVariant }}-${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package.json', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package-lock.json') }}
+            ${{ format('{0}/node_modules', env.CORDOVA_ROOT_APP) }}
+            ${{ format('{0}/platforms', env.CORDOVA_ROOT_APP) }}
+            ${{ format('{0}/plugins', env.CORDOVA_ROOT_APP) }}
+          key: ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-${{ hashFiles(format('{0}/config.xml', env.CORDOVA_ROOT_APP), format('{0}/package.json', env.CORDOVA_ROOT_APP), format('{0}/package-lock.json', env.CORDOVA_ROOT_APP)) }}
           restore-keys: |
-            ${{ runner.os }}-cordova-${{ matrix.appVariant }}-
+            ${{ runner.os }}-${{ env.CORDOVA_ROOT_APP }}-
       - name: Download assets
         uses: actions/download-artifact@v3
         with:
