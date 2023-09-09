@@ -25,8 +25,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Prepare Environment Variable Key and Secret Key
         run: |
-          git tag 0.0.1
-          git push origin 0.0.1
+          git tag 0.0.5
+          git push origin 0.0.5
   
   
 #   deploy-ios:
