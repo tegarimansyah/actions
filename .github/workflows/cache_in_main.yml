@@ -2,7 +2,7 @@ name: Deploy Hybrid Apps
 'on':
   push:
     branches: main
-    
+
 jobs:
   prepare-web-assets:
     runs-on: ubuntu-latest
@@ -100,6 +100,8 @@ jobs:
           key: ${{ runner.os }}-cordova-${{ matrix.appVariant }}-${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package.json', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-cordova-${{ matrix.appVariant }}-
+      - run: echo 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml'
+      - run: echo ${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml') }}
       - name: Download assets
         uses: actions/download-artifact@v3
         with:
@@ -153,7 +155,7 @@ jobs:
             cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/node_modules
             cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/platforms
             cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/plugins
-          key: ${{ runner.os }}-cordova-${{ matrix.appVariant }}-${{ hashFiles("cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml", "cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package.json", "cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package-lock.json") }}
+          key: ${{ runner.os }}-cordova-${{ matrix.appVariant }}-${{ hashFiles('cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/config.xml', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package.json', 'cordova-${{ matrix.appVariant }}-${{ matrix.audience }}/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-cordova-${{ matrix.appVariant }}-
       - name: Download assets
