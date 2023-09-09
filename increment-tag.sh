@@ -6,3 +6,4 @@ new_tag="$new_version-hybrid" # Create the new tag
 git tag "$new_tag"
 echo "Previous tag: $current_tag"
 echo "New tag: $new_tag"
+        
