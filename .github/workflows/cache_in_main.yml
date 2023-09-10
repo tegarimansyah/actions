@@ -24,6 +24,9 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
         with:
+          # Authenticate repository using our deploy key
+          # So we can push and trigger another workflow
+          ssh-key: "${{ secrets.DEPLOY_KEY }}"
           # By default, this will only fetch last commit
           # set 0 to fetch all history, including tag
           # set XX to fetch previous XX commits, but tag not included
