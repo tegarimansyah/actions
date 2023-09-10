@@ -23,6 +23,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+        with:
+          # set 0 to fetch all history
+          # set XX to fetch previous XX commits 
+          fetch-depth: 50
       - name: Prepare Environment Variable Key and Secret Key
         run: |
           current_tag=$(git describe --abbrev=0 --tags) # Get latest
